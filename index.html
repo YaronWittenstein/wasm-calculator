@@ -1,0 +1,80 @@
+<html>
+  </body>
+  <script>
+    var arg1 = document.createElement("input");
+    arg1.type = "text";
+
+    var arg2 = document.createElement("input");
+    arg2.type = "text";
+
+    var plusBtn = document.createElement("input");
+    plusBtn.type = "button";
+
+    var minusBtn = document.createElement("input");
+    minusBtn.type = "button";
+
+    var mulBtn = document.createElement("input");
+    mulBtn.type = "button";
+
+    var calcLabel = document.createElement("input");
+    calcLabel.type = "text";
+
+    arg1.value = 10;
+    arg2.value = 20;
+
+    plusBtn.value = "+";
+    minusBtn.value = "-";
+    mulBtn.value = "*";
+
+    plusBtn.onclick = function() {
+      doCalc("+");
+    };
+
+    minusBtn.onclick = function() {
+      doCalc("-");
+    };
+
+    mulBtn.onclick = function() {
+      doCalc("*");
+    };
+
+    function doCalc(op) {
+      var a = parseInt(arg1.value);
+      var b = parseInt(arg2.value);
+
+      if (op === "+") {
+        window.wasm.instance.exports.calc(a, b, 43);
+      }
+      else if (op === "-")  {
+        window.wasm.instance.exports.calc(a, b, 45);
+      }
+      else if (op === "*")  {
+        window.wasm.instance.exports.calc(a, b, 42);
+      }
+    }
+
+    document.body.appendChild(arg1);
+    document.body.appendChild(arg2);
+    document.body.appendChild(calcLabel);
+    document.body.appendChild(plusBtn);
+    document.body.appendChild(minusBtn);
+    document.body.appendChild(mulBtn);
+
+    var importObject = {
+      js: {
+        showResult: function(res) {
+          calcLabel.value = res;
+        }
+      }
+    };
+
+    fetch('http://0.0.0.0:8000/calculator.wasm').then(response =>
+      response.arrayBuffer())
+    .then(bytes =>
+      WebAssembly.instantiate(bytes, importObject))
+    .then(result => {
+      console.log("loaded 'calculator.wasm'");
+      window.wasm = result;
+    });
+  </script>
+</html>
